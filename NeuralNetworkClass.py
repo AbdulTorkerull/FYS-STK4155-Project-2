@@ -168,3 +168,6 @@ class NeuralNetwork:
 
     def jax_gradient(self, inputs, targets):
         pass
+
+
+## hei

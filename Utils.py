@@ -1,5 +1,4 @@
 import numpy as np
-import jax.numpy as jnp
 
 def confusion_matrix(y_true, y_pred):
     y_true = np.asarray(y_true).ravel().astype(int)
@@ -70,3 +69,6 @@ def roc_auc(y_true, scores):
     AUC = (sum_R - (1/2)*n_pos*(n_pos + 1))/(n_pos*n_neg)
 
     return AUC
+
+def cross_validation():
+    pass

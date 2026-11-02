@@ -3,7 +3,6 @@ import jax.numpy as jnp
 import matplotlib.pyplot as plt
 
 class NeuralNetwork:
-
     def __init__(self, network_input_size, layer_output_sizes, activation_funcs, activation_ders, cost_fun, cost_der, classification=False):
         self.network_input_size =  network_input_size
         self.layer_output_sizes = layer_output_sizes

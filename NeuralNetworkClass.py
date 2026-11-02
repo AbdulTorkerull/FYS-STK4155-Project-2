@@ -34,8 +34,14 @@ class NeuralNetwork:
         layers = []
 
         layer_input_size = network_input_size
-        for layer_output_size in layer_output_sizes:
-            scaling = np.sqrt(2/layer_input_size)
+        for layer_output_size, activation in zip(layer_output_sizes, self.activation_funcs):
+            activation_name = getattr(activation, "__name__", "").lower()
+
+            if activation_name in ("relu", "leaky_relu"): 
+                scaling = np.sqrt(2/layer_input_size)
+            else: 
+                scaling = np.sqrt(1/layer_input_size)
+
             W = self.rng.standard_normal((layer_output_size, layer_input_size))*scaling
             b = np.zeros((layer_output_size, 1))
             layers.append((W, b))
@@ -190,39 +196,8 @@ class NeuralNetwork:
     def jax_gradient(self, inputs, targets):
         pass
 
-<<<<<<< HEAD
 if __name__ == "__main__":
-
-    def ReLU(z):
-        return jnp.where(z > 0, z, 0.0)
-
-    def ReLU_der(z):
-        return jnp.where(z > 0, 1.0, 0.0)
-
-
-    def sigmoid(z):
-        return 1/(1 + jnp.exp(-z))
-
-    def sigmoid_der(z):
-        sig = sigmoid(z)
-        
-        return sig*(1 - sig)
-
-    def cross_entropy(predict, target):
-        return jnp.mean(jnp.sum(-target*jnp.log(predict), axis=0))
-
-    def softmax(z):
-        e_z = jnp.exp(z - jnp.max(z, axis=0, keepdims=True))
-        return e_z/jnp.sum(e_z, axis=0, keepdims=True)
-
-    def mse(predict, target):
-        return jnp.mean((predict - target)**2)
-    
-    def mse_der(predict, target):
-        return (2/predict.size)*(predict - target)
-
-    def runge(x):
-        return 1/(1 + 25 * x**2)
+    from Functions import ReLU, ReLU_der, sigmoid, sigmoid_der, cross_entropy, mse, mse_der, runge
     
     datapoints = 100
     network_input_size = 1
@@ -248,7 +223,3 @@ if __name__ == "__main__":
     plt.plot(x.ravel(), y_hat.ravel())
     plt.plot(x.ravel(), y.ravel())
     plt.show()
-=======
-
-## hei
->>>>>>> f9dad17b86c7b2bf8c95e3fe44c7b39b700e53c1

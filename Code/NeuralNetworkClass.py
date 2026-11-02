@@ -41,8 +41,8 @@ class NeuralNetwork:
             else: 
                 scaling = np.sqrt(1/layer_input_size) # Add Xavier scaling to layers using any other activation function
 
-            W = self.rng.standard_normal((layer_output_size, layer_input_size))*scaling
-            b = np.zeros((layer_output_size, 1))
+            W = self.rng.standard_normal((layer_input_size, layer_output_size))*scaling
+            b = np.zeros((1, layer_output_size))
             layers.append((W, b))
 
             layer_input_size = layer_output_size
@@ -57,7 +57,7 @@ class NeuralNetwork:
         for (W, b), activation_func in zip(self.layers, self.activation_funcs):
             layer_inputs.append(a)
 
-            z = W @ a + b
+            z = a @ W + b
             a = activation_func(z)
 
             layer_outputs.append(z)
@@ -121,7 +121,7 @@ class NeuralNetwork:
         a = inputs
 
         for (W, b), activation_func in zip(self.layers, self.activation_funcs):
-            z = W @ a + b
+            z = a @ W + b
             a = activation_func(z)
 
         return a
@@ -153,19 +153,19 @@ class NeuralNetwork:
 
             if i == len(self.layers) - 1:
                 if self.classification is True:
-                    dC_dz  = (final_output - targets)/inputs.shape[1]
+                    dC_dz  = (final_output - targets)/inputs.shape[0]
                 else:
                     dC_da  = self.cost_der(final_output, targets)
                     dC_dz = dC_da*activation_der(z)
 
             else:
                 (W, b) = self.layers[i + 1] 
-                dC_da = W.T @ dC_dz
+                dC_da = dC_dz @ W.T
                 dC_dz = dC_da*activation_der(z)
 
             (W, b) = self.layers[i]
-            dC_db = np.sum(dC_dz, axis=1, keepdims=True)
-            dC_dW =dC_dz @ a.T
+            dC_db = np.sum(dC_dz, axis=0, keepdims=True)
+            dC_dW = a.T @ dC_dz
             
             if self.penalty == "L1":  dC_dW += self.lam*np.sign(W)
             elif self.penalty == "L2": dC_dW += 2*self.lam*W
@@ -185,15 +185,15 @@ class NeuralNetwork:
 
     def train(self, inputs, targets, epochs=100, M=None, epsilon=1e-9):
         if M is None:
-            M = inputs.shape[1]
+            M = inputs.shape[0]
 
         self._init_state()
         costs = []
         unpenalized_costs = []
 
         for epoch in range(1, epochs + 1):
-            for idx in self._get_minibatches(inputs.shape[1], M):
-                inputs_batch, targets_batch = inputs[:, idx], targets[:, idx]
+            for idx in self._get_minibatches(inputs.shape[0], M):
+                inputs_batch, targets_batch = inputs[idx], targets[idx]
 
                 self.t += 1
                 grads = self.compute_gradient(inputs_batch, targets_batch)
@@ -224,8 +224,9 @@ if __name__ == "__main__":
     cost_fun = mse
     cost_der = mse_der
 
-    x = np.linspace(-1, 1, datapoints).reshape(-1, 1).T
-    y = runge(np.linspace(-1, 1, datapoints)).reshape(-1, 1).T
+    x = np.linspace(-1, 1, datapoints).reshape(-1, 1)
+    print(x.shape)
+    y = runge(np.linspace(-1, 1, datapoints)).reshape(-1, 1)
 
     NN = NeuralNetwork(network_input_size, layer_output_sizes, activation_funcs, activation_ders, cost_fun, cost_der)
     NN.optimizer("ADAM")

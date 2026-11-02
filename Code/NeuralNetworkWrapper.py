@@ -21,7 +21,7 @@ class NeuralNetRegressor(BaseEstimator, RegressorMixin):
     def fit(self, X, y):
         X = np.asarray(X, dtype=float)
         y = np.asarray(y, dtype=float).ravel()
-        Y = y.reshape(1, -1)
+        Y = y.reshape(-1, 1)
 
         network_input_size = X.shape[1]
         layer_output_sizes = list(self.layer_output_sizes)
@@ -32,9 +32,12 @@ class NeuralNetRegressor(BaseEstimator, RegressorMixin):
         self.NN.learning_rate(self.gamma)
         self.NN.change_seed(self.seed)
 
-        self.n_epochs_, self.cost_history_, self.unpenalized_history_ = self.NN.train(X.T, Y, epochs=self.epochs, M=self.M, epsilon=self.epsilon)
+        self.n_epochs_, self.cost_history_, self.unpenalized_history_ = self.NN.train(X, Y, epochs=self.epochs, M=self.M, epsilon=self.epsilon)
 
         return self
 
     def predict(self, X):
-        return np.asarray(self.NN.predict(np.asarray(X, dtype=float).T)).ravel()
+        return np.asarray(self.NN.predict(np.asarray(X, dtype=float))).ravel()
+
+if __name__ == "__main__":
+    pass

@@ -37,9 +37,9 @@ class NeuralNetwork:
             activation_name = getattr(activation, "__name__", "").lower()
 
             if activation_name in ("relu", "leaky_relu"): 
-                scaling = np.sqrt(2/layer_input_size)
+                scaling = np.sqrt(2/layer_input_size) # Add He scaling to layers using ReLU family as activation function
             else: 
-                scaling = np.sqrt(1/layer_input_size)
+                scaling = np.sqrt(1/layer_input_size) # Add Xavier scaling to layers using any other activation function
 
             W = self.rng.standard_normal((layer_output_size, layer_input_size))*scaling
             b = np.zeros((layer_output_size, 1))

@@ -1,5 +1,14 @@
 import numpy as np
 
+def one_hot(y, n_classes=10):
+    """input er fasiten, heltall 0-9"""
+    
+    y = np.asarray(y, dtype=int)
+    Y = np.zeros((y.size, n_classes))
+    Y[np.arange(y.size), y] = 1.0
+
+    return Y
+
 def confusion_matrix(y_true, y_pred):
     y_true = np.asarray(y_true).ravel().astype(int)
     y_pred = np.asarray(y_pred).ravel().astype(int)
@@ -69,6 +78,3 @@ def roc_auc(y_true, scores):
     AUC = (sum_R - (1/2)*n_pos*(n_pos + 1))/(n_pos*n_neg)
 
     return AUC
-
-def cross_validation():
-    pass

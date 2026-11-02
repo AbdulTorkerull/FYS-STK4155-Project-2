@@ -1,26 +1,33 @@
 import numpy as np
+import jax.numpy as jnp
+import matplotlib.pyplot as plt
 
 class NeuralNetwork:
-    def __init__(self, network_input_size, layer_output_sizes, activation_funcs, activation_ders, cost_fun, cost_der):
+
+    def __init__(self, network_input_size, layer_output_sizes, activation_funcs, activation_ders, cost_fun, cost_der, classification=False):
         self.network_input_size =  network_input_size
         self.layer_output_sizes = layer_output_sizes
         self.activation_funcs = activation_funcs
         self.activation_ders = activation_ders
         self.cost_fun = cost_fun
         self.cost_der = cost_der
+        self.classification = classification
 
+        self.rng = np.random.default_rng(2026)
         self.layers = self._create_layers(network_input_size, layer_output_sizes)
         self.vrm = [(np.zeros((3, *W.shape)), np.zeros((3, *b.shape))) for W, b in self.layers]
         self.method = "PLAIN"
+        self.penalty = "L2"
+        self.lam = 0.0
         self.gamma = 0.001
         self.t = 0
-        self.rng = np.random.default_rng(2026)
 
     def _init_state(self):
+        self.layers = self._create_layers(self.network_input_size, self.layer_output_sizes)
         self.vrm = [(np.zeros((3, *W.shape)), np.zeros((3, *b.shape))) for W, b in self.layers]
         self.t = 0
 
-        return self.vrm, self.t
+        return self.layers, self.vrm, self.t
 
 
     def _create_layers(self, network_input_size, layer_output_sizes):
@@ -28,8 +35,9 @@ class NeuralNetwork:
 
         layer_input_size = network_input_size
         for layer_output_size in layer_output_sizes:
-            W = self.rng.standard_normal((layer_output_size, layer_input_size))
-            b = self.rng.standard_normal((layer_output_size, 1))
+            scaling = np.sqrt(2/layer_input_size)
+            W = self.rng.standard_normal((layer_output_size, layer_input_size))*scaling
+            b = np.zeros((layer_output_size, 1))
             layers.append((W, b))
 
             layer_input_size = layer_output_size
@@ -76,7 +84,7 @@ class NeuralNetwork:
             vrm[1] = beta2*vrm[1] + (1 - beta2)*grad**2
             m_hat, r_hat = vrm[2]/(1 - beta1**t), vrm[1]/(1 - beta2**t)
 
-            return theta - (gamma*m_hat)/(np.sqrt(r_hat + eps))
+            return theta - (gamma*m_hat)/(np.sqrt(r_hat) + eps)
         
     def _get_minibatches(self, n, M):
         idx = self.rng.permutation(n)
@@ -97,6 +105,12 @@ class NeuralNetwork:
         self.gamma = gamma
 
         return self.gamma
+
+    def add_penalty(self, lam, penalty):
+        self.lam = lam
+        self.penalty = penalty
+
+        return self.lam, self.penalty
 
     def predict(self, inputs):
         a = inputs
@@ -120,15 +134,24 @@ class NeuralNetwork:
             a, z, activation_der = layer_inputs[i], layer_outputs[i], self.activation_ders[i]
 
             if i == len(self.layers) - 1:
-                dC_da  = self.cost_der(final_output, targets)
+                if self.classification is True:
+                    dC_dz  = (final_output - targets)/inputs.shape[1]
+                else:
+                    dC_da  = self.cost_der(final_output, targets)
+                    dC_dz = dC_da*activation_der(z)
 
             else:
-                (W, b) = self.layers[i + 1]
+                (W, b) = self.layers[i + 1] 
                 dC_da = W.T @ dC_dz
+                dC_dz = dC_da*activation_der(z)
 
-            dC_dz = dC_da*activation_der(z)
-            dC_db = jnp.sum(dC_dz, axis=1, keepdims=True)
-            dC_dW = dC_dz @ a.T
+            (W, b) = self.layers[i]
+            dC_db = np.sum(dC_dz, axis=1, keepdims=True)
+            dC_dW =dC_dz @ a.T
+            
+            if self.penalty == "L1":  dC_dW += self.lam*np.sign(W)
+            elif self.penalty == "L2": dC_dW += 2*self.lam*W
+            elif self.penalty is not None: raise ValueError(f"Unknown penalty: {self.penalty!r}")
 
             layer_grads[i] = (dC_dW, dC_db)
 
@@ -161,10 +184,66 @@ class NeuralNetwork:
 
         return costs
 
-    # These last two methods are not needed in the project, but they can be nice to have!
-    # The first one has a layers parameter so that you can use jax.grad on it.
     def jax_compliant_predict(self, layers, inputs):
         pass
 
     def jax_gradient(self, inputs, targets):
         pass
+
+if __name__ == "__main__":
+
+    def ReLU(z):
+        return jnp.where(z > 0, z, 0.0)
+
+    def ReLU_der(z):
+        return jnp.where(z > 0, 1.0, 0.0)
+
+
+    def sigmoid(z):
+        return 1/(1 + jnp.exp(-z))
+
+    def sigmoid_der(z):
+        sig = sigmoid(z)
+        
+        return sig*(1 - sig)
+
+    def cross_entropy(predict, target):
+        return jnp.mean(jnp.sum(-target*jnp.log(predict), axis=0))
+
+    def softmax(z):
+        e_z = jnp.exp(z - jnp.max(z, axis=0, keepdims=True))
+        return e_z/jnp.sum(e_z, axis=0, keepdims=True)
+
+    def mse(predict, target):
+        return jnp.mean((predict - target)**2)
+    
+    def mse_der(predict, target):
+        return (2/predict.size)*(predict - target)
+
+    def runge(x):
+        return 1/(1 + 25 * x**2)
+    
+    datapoints = 100
+    network_input_size = 1
+    layer_output_sizes = [18, 12, 18, 12, 1]
+    activation_funcs = [sigmoid, ReLU, ReLU, sigmoid, sigmoid]
+    activation_ders = [sigmoid_der, ReLU_der, ReLU_der, sigmoid_der, sigmoid_der]
+    cost_fun = mse
+    cost_der = mse_der
+
+    x = np.linspace(-1, 1, datapoints).reshape(-1, 1).T
+    y = runge(np.linspace(-1, 1, datapoints)).reshape(-1, 1).T
+
+    print(x.shape)
+    print(y.shape)
+
+    NN = NeuralNetwork(network_input_size, layer_output_sizes, activation_funcs, activation_ders, cost_fun, cost_der)
+    NN.optimizer("ADAM")
+    NN.learning_rate(0.01)
+    NN.add_penalty(1e-5, "L2")
+    costs = NN.train(x, y, epochs=500, M=50)
+    y_hat = NN.predict(x)
+
+    plt.plot(x.ravel(), y_hat.ravel())
+    plt.plot(x.ravel(), y.ravel())
+    plt.show()

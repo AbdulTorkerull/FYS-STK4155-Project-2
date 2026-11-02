@@ -190,6 +190,7 @@ class NeuralNetwork:
     def jax_gradient(self, inputs, targets):
         pass
 
+<<<<<<< HEAD
 if __name__ == "__main__":
 
     def ReLU(z):
@@ -247,3 +248,7 @@ if __name__ == "__main__":
     plt.plot(x.ravel(), y_hat.ravel())
     plt.plot(x.ravel(), y.ravel())
     plt.show()
+=======
+
+## hei
+>>>>>>> f9dad17b86c7b2bf8c95e3fe44c7b39b700e53c1

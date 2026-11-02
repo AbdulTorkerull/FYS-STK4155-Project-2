@@ -21,11 +21,11 @@ def sigmoid_der(z):
     return sig*(1 - sig)
 
 def cross_entropy(predict, target):
-    return jnp.mean(jnp.sum(-target*jnp.log(predict), axis=0))
+    return jnp.mean(jnp.sum(-target*jnp.log(predict), axis=1))
 
 def softmax(z):
-    e_z = jnp.exp(z - jnp.max(z, axis=0, keepdims=True))
-    return e_z/jnp.sum(e_z, axis=0, keepdims=True)
+    e_z = jnp.exp(z - jnp.max(z, axis=1, keepdims=True))
+    return e_z/jnp.sum(e_z, axis=1, keepdims=True)
 
 def mse(predict, target):
     return jnp.mean((predict - target)**2)

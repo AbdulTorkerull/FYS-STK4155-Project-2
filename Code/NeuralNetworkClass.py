@@ -126,10 +126,23 @@ class NeuralNetwork:
 
         return a
 
-    def cost(self, inputs, targets):
+    def unpenalized_cost(self, inputs, targets):
         final_output = self.predict(inputs)
         
         return self.cost_fun(final_output, targets)
+
+    def cost(self, inputs, targets):
+        final_output = self.predict(inputs)
+        pen = 0.0
+
+        if self.penalty == "L1":
+            pen = self.lam*sum(np.sum(np.abs(W)) for W, _ in self.layers)
+        elif self.penalty == "L2":
+            pen = self.lam*sum(np.sum(W**2) for W, _ in self.layers)
+        elif self.penalty is not None:
+            raise ValueError(f"Unknown penalty: {self.penalty!r}")
+
+        return self.cost_fun(final_output, targets) + pen
 
     def compute_gradient(self, inputs, targets):
         layer_inputs, layer_outputs, final_output = self._feed_forward(inputs)
@@ -170,12 +183,13 @@ class NeuralNetwork:
 
         return self.layers
 
-    def train(self, inputs, targets, epochs=100, M=None):
+    def train(self, inputs, targets, epochs=100, M=None, epsilon=1e-9):
         if M is None:
             M = inputs.shape[1]
 
         self._init_state()
         costs = []
+        unpenalized_costs = []
 
         for epoch in range(1, epochs + 1):
             for idx in self._get_minibatches(inputs.shape[1], M):
@@ -186,8 +200,12 @@ class NeuralNetwork:
                 self.layers = self.update_weights(grads)
 
             costs.append(self.cost(inputs, targets))
+            unpenalized_costs.append(self.unpenalized_cost(inputs, targets))
 
-        return costs
+            if epoch > 1 and abs(costs[-2] - costs[-1]) < epsilon:
+                break
+
+        return epoch, costs, unpenalized_costs
 
     def jax_compliant_predict(self, layers, inputs):
         pass
@@ -209,15 +227,14 @@ if __name__ == "__main__":
     x = np.linspace(-1, 1, datapoints).reshape(-1, 1).T
     y = runge(np.linspace(-1, 1, datapoints)).reshape(-1, 1).T
 
-    print(x.shape)
-    print(y.shape)
-
     NN = NeuralNetwork(network_input_size, layer_output_sizes, activation_funcs, activation_ders, cost_fun, cost_der)
     NN.optimizer("ADAM")
     NN.learning_rate(0.01)
     NN.add_penalty(1e-5, "L2")
-    costs = NN.train(x, y, epochs=500, M=50)
+    epochs, costs, unpenalized_costs = NN.train(x, y, epochs=500, M=50)
     y_hat = NN.predict(x)
+
+    print(f"Epochs: {epochs}")
 
     plt.plot(x.ravel(), y_hat.ravel())
     plt.plot(x.ravel(), y.ravel())

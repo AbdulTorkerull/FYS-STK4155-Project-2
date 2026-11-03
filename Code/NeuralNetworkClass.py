@@ -1,5 +1,4 @@
-import numpy as np
-import jax.numpy as jnp
+import numpy as np 
 import matplotlib.pyplot as plt
 
 class NeuralNetwork:
@@ -64,7 +63,7 @@ class NeuralNetwork:
 
         return layer_inputs, layer_outputs, a
 
-    def _adaptive_method_step(self, method, theta, grad, vrm, gamma, t, beta=0.9, beta1=0.9, beta2=0.999, rho=0.99, eps=1e-8):
+    def _adaptive_method_step(self, method, theta, grad, vrm, gamma, t, beta=0.9, beta1=0.9, beta2=0.999, rho=0.99, eps=1e-9):
 
         if method == "PLAIN":                                   
             return theta - gamma*grad
@@ -183,7 +182,7 @@ class NeuralNetwork:
 
         return self.layers
 
-    def train(self, inputs, targets, epochs=100, M=None, epsilon=1e-9):
+    def train(self, inputs, targets, epochs=100, M=None, epsilon=1e-6):
         if M is None:
             M = inputs.shape[0]
 
@@ -214,27 +213,31 @@ class NeuralNetwork:
         pass
 
 if __name__ == "__main__":
-    from Functions import ReLU, ReLU_der, sigmoid, sigmoid_der, cross_entropy, mse, mse_der, runge
-    
+    from Functions import linear, linear_der, ReLU, ReLU_der, sigmoid, sigmoid_der, cross_entropy, mse, mse_der, runge
+    import time
+
     datapoints = 100
     network_input_size = 1
-    layer_output_sizes = [18, 12, 18, 12, 1]
-    activation_funcs = [sigmoid, ReLU, ReLU, sigmoid, sigmoid]
-    activation_ders = [sigmoid_der, ReLU_der, ReLU_der, sigmoid_der, sigmoid_der]
+    layer_output_sizes = [32, 16, 32, 16, 32, 1]
+    activation_funcs = [sigmoid, ReLU, ReLU, sigmoid, sigmoid, linear]
+    activation_ders = [sigmoid_der, ReLU_der, ReLU_der, sigmoid_der, sigmoid_der, linear_der]
     cost_fun = mse
     cost_der = mse_der
 
     x = np.linspace(-1, 1, datapoints).reshape(-1, 1)
-    print(x.shape)
     y = runge(np.linspace(-1, 1, datapoints)).reshape(-1, 1)
 
+    t0 = time.perf_counter()
     NN = NeuralNetwork(network_input_size, layer_output_sizes, activation_funcs, activation_ders, cost_fun, cost_der)
     NN.optimizer("ADAM")
     NN.learning_rate(0.01)
     NN.add_penalty(1e-5, "L2")
-    epochs, costs, unpenalized_costs = NN.train(x, y, epochs=500, M=50)
+    epochs, costs, unpenalized_costs = NN.train(x, y, epochs=500, M=100)
     y_hat = NN.predict(x)
-
+    t1 = time.perf_counter()
+    runtime = t1 - t0
+    
+    print(f"Runtime: {runtime}")
     print(f"Epochs: {epochs}")
 
     plt.plot(x.ravel(), y_hat.ravel())

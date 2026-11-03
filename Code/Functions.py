@@ -26,18 +26,18 @@ def sigmoid_der(z):
     
     return sig*(1 - sig)
 
-def cross_entropy(predict, target):
-    return np.mean(np.sum(-target*np.log(predict), axis=1))
-
-def softmax(z):
-    e_z = np.exp(z - np.max(z, axis=1, keepdims=True))
-    return e_z/np.sum(e_z, axis=1, keepdims=True)
-
 def mse(predict, target):
     return np.mean((predict - target)**2)
 
 def mse_der(predict, target):
     return (2/predict.size)*(predict - target)
+
+def softmax(z):
+    e_z = np.exp(z - np.max(z, axis=1, keepdims=True))
+    return e_z/np.sum(e_z, axis=1, keepdims=True)
+
+def cross_entropy(predict, target):
+    return np.mean(np.sum(-target*np.log(predict), axis=1))
 
 def runge(x):
     return 1/(1 + 25*x**2)

@@ -213,9 +213,11 @@ class NeuralNetwork:
         pass
 
 if __name__ == "__main__":
-    from Functions import linear, linear_der, ReLU, ReLU_der, sigmoid, sigmoid_der, cross_entropy, mse, mse_der, runge
+    from Functions import linear, linear_der, ReLU, ReLU_der, sigmoid, sigmoid_der, mse, mse_der, softmax, cross_entropy, runge
+    from sklearn import datasets
     import time
 
+    """Check if NeuralNetwork class is capable of solving a regression problem by trying to fit the runge function"""
     datapoints = 100
     network_input_size = 1
     layer_output_sizes = [32, 16, 32, 16, 32, 1]
@@ -232,14 +234,51 @@ if __name__ == "__main__":
     NN.optimizer("ADAM")
     NN.learning_rate(0.01)
     NN.add_penalty(1e-5, "L2")
-    epochs, costs, unpenalized_costs = NN.train(x, y, epochs=500, M=100)
+    epochs, costs, unpenalized_costs = NN.train(x, y, epochs=500, M=50)
     y_hat = NN.predict(x)
     t1 = time.perf_counter()
     runtime = t1 - t0
-    
+
+    print(f"Regression (Runge function)")
     print(f"Runtime: {runtime}")
     print(f"Epochs: {epochs}")
 
-    plt.plot(x.ravel(), y_hat.ravel())
-    plt.plot(x.ravel(), y.ravel())
+    plt.title("Regression problem (Runge function)")
+    plt.plot(x.ravel(), y_hat.ravel(), label="Fitted Runge function (FFNN)")
+    plt.plot(x.ravel(), y.ravel(), label="Runge function")
+    plt.legend()
+    plt.show()
+
+    """Check if NeuralNetwork class is capable of solving a classification problem by trying to classify Iris dataset"""
+    iris = datasets.load_iris()
+
+    inputs = iris.data
+    targets = np.zeros((len(iris.data), 3))
+    for i, t in enumerate(iris.target):
+        targets[i, t] = 1
+
+    network_input_size = 4
+    layer_output_sizes = [6, 8, 3]
+    activation_funcs = [sigmoid, ReLU, softmax]
+    activation_ders = [sigmoid_der, ReLU_der, None]
+    cost_fun = cross_entropy
+    cost_der = None
+
+    t0 = time.perf_counter()
+    NN = NeuralNetwork(network_input_size, layer_output_sizes, activation_funcs, activation_ders, cost_fun, cost_der, classification=True)
+    NN.optimizer("ADAM")
+    NN.learning_rate(0.01)
+    NN.add_penalty(1e-3, "L2")
+    epochs, costs, unpenalized_costs = NN.train(inputs, targets, epochs=500, M=None)
+    t1 = time.perf_counter()
+    runtime = t1 - t0
+
+    print(f"Classification (Iris data)")
+    print(f"Runtime: {runtime}")
+    print(f"Epochs: {epochs}")
+
+    plt.title("Classification problem (Iris dataset)")
+    plt.plot(np.linspace(0, epochs, epochs), costs, label="Cost")
+    plt.plot(np.linspace(0, epochs, epochs), unpenalized_costs, label="Unpenalized Cost")
+    plt.legend()
     plt.show()

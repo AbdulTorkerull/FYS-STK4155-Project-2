@@ -1,3 +1,6 @@
+"""File containing simple functions such as the activation functions and their derivatives, cost functions 
+and their derivatives, and the Runge function"""
+
 import numpy as np
 
 def linear(z):

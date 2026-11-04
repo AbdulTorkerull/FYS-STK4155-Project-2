@@ -50,7 +50,3 @@ class NeuralNetRegressor(BaseEstimator, RegressorMixin):
         """Method for predicting targets from a matrix of inputs X with shape (samples) x (features). Returns a vector with one prediction per sample"""
 
         return np.asarray(self.NN.predict(np.asarray(X, dtype=float))).ravel() # Predict with the trained network and flatten the output into a vector
-
-
-if __name__ == "__main__":
-    pass

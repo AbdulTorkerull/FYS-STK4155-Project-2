@@ -1,0 +1,2 @@
+"""Test file for the NeuralNetRegressor class. The testing is done by comparing the class against results from already esteablished
+and trusted packages like Scikit-Learn, TensorFlow/Keras, PyTorch, and seing if the produce similiar enough results"""

@@ -2,10 +2,10 @@
 It also contains two examples, one where its used to solve a regression problem and one where its used to
 to solve a classification problem"""
 
-import jax
-import numpy as np 
-import jax.numpy as jnp
 import matplotlib.pyplot as plt
+import jax.numpy as jnp
+import numpy as np 
+import jax
 jax.config.update("jax_enable_x64", True)
 
 

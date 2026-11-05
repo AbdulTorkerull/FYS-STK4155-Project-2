@@ -1,7 +1,8 @@
 """Test file for the NeuralNetwork class. The testing is done by comparing the class against already esteablished and 
 trusted packages like Scikit-Learn, TensorFlow/Keras, PyTorch, and seing if the produce similiar enough results"""
 
-from Functions import linear, linear_der, ReLU, ReLU_der, sigmoid, sigmoid_der, mse, mse_der, softmax, cross_entropy, runge
+
+from Functions import identity, identity_der, ReLU, ReLU_der, sigmoid, sigmoid_der, mse, mse_der, softmax, cross_entropy, runge
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.neural_network import MLPRegressor
 from NeuralNetworkClass import NeuralNetwork
@@ -10,11 +11,12 @@ from sklearn import datasets
 import numpy as np
 import warnings
 
+
 # --- Ignore SK-learn warning --- #
 warnings.filterwarnings("ignore", category=ConvergenceWarning)
 
 #  --- Parameters --- #
-lam = 1e-6
+lam = 1e-9
 penalty = "L2"
 lr = 0.01
 adaptive_method = "ADAM"
@@ -32,8 +34,8 @@ y = runge(np.linspace(-1, 1, datapoints)).reshape(-1, 1)
 # --- Neural Network structure --- #
 network_input_size = 1
 layer_output_sizes = [50, 50, 1]
-activation_funcs = [sigmoid, sigmoid, linear]
-activation_ders = [sigmoid_der, sigmoid_der, linear_der]
+activation_funcs = [sigmoid, sigmoid, identity]
+activation_ders = [sigmoid_der, sigmoid_der, identity_der]
 cost_fun = mse
 cost_der = mse_der
 
@@ -80,3 +82,4 @@ plt.xlabel("x")
 plt.ylabel("f(x)")
 plt.legend()
 plt.show()
+

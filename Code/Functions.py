@@ -1,12 +1,14 @@
 """File containing simple functions such as the activation functions and their derivatives, cost functions 
 and their derivatives, and the Runge function"""
 
+
 import numpy as np
 
-def linear(z):
+
+def identity(z):
     return z
 
-def linear_der(z):
+def identity_der(z):
     return np.ones_like(z)
 
 def ReLU(z):

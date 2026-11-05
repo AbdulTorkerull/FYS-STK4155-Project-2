@@ -2,6 +2,7 @@
 It also contains two examples, one where its used to solve a regression problem and one where its used to
 to solve a classification problem"""
 
+
 import numpy as np 
 import matplotlib.pyplot as plt
 
@@ -255,7 +256,7 @@ class NeuralNetwork:
     
 
 if __name__ == "__main__":
-    from Functions import linear, linear_der, ReLU, ReLU_der, sigmoid, sigmoid_der, mse, mse_der, softmax, cross_entropy, runge
+    from Functions import identity, identity_der, ReLU, ReLU_der, sigmoid, sigmoid_der, mse, mse_der, softmax, cross_entropy, runge
     from sklearn import datasets
     import time
 
@@ -264,8 +265,8 @@ if __name__ == "__main__":
     datapoints = 100
     network_input_size = 1
     layer_output_sizes = [32, 16, 32, 16, 32, 1]
-    activation_funcs = [sigmoid, ReLU, ReLU, sigmoid, sigmoid, linear]
-    activation_ders = [sigmoid_der, ReLU_der, ReLU_der, sigmoid_der, sigmoid_der, linear_der]
+    activation_funcs = [sigmoid, ReLU, ReLU, sigmoid, sigmoid, identity]
+    activation_ders = [sigmoid_der, ReLU_der, ReLU_der, sigmoid_der, sigmoid_der, identity_der]
     cost_fun = mse
     cost_der = mse_der
 

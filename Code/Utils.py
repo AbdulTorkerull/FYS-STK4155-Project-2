@@ -1,6 +1,8 @@
 """File containing other utilty functions that are relevant to the project"""
 
+
 import numpy as np
+
 
 def one_hot(y, n_classes=10):
     """Function for turning a vector of integer class labels into a one hot encoded matrix with shape (samples) x (classes)"""

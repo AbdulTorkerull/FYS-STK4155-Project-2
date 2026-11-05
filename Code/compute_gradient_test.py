@@ -1,0 +1,2 @@
+"""Test file for the compute_gradien method in NeuralNetworkClass class. The testing is done by comparing the methid against results
+the package JAX and seing if they produce similiar enough results"""

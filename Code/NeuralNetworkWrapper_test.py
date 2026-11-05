@@ -1,5 +1,5 @@
 """Test file for the NeuralNetRegressor class. The testing is done by comparing the class against results from already esteablished
-and trusted packages like Scikit-Learn, TensorFlow/Keras, PyTorch, and seing if the produce similiar enough results"""
+and trusted packages like Scikit-Learn, TensorFlow/Keras, PyTorch, and seing if they produce similiar enough results"""
 
 
 from Functions import identity, identity_der, ReLU, ReLU_der, sigmoid, sigmoid_der, mse, mse_der, softmax, cross_entropy, runge

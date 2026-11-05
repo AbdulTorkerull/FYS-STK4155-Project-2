@@ -1,5 +1,5 @@
 """Test file for the NeuralNetwork class. The testing is done by comparing the class against already esteablished and 
-trusted packages like Scikit-Learn, TensorFlow/Keras, PyTorch, and seing if the produce similiar enough results"""
+trusted packages like Scikit-Learn, TensorFlow/Keras, PyTorch, and seing if they produce similiar enough results"""
 
 
 from Functions import identity, identity_der, ReLU, ReLU_der, sigmoid, sigmoid_der, mse, mse_der, softmax, cross_entropy, runge
@@ -12,7 +12,7 @@ import numpy as np
 import warnings
 
 
-# --- Ignore SK-learn warning --- #
+# --- Ignore SK-learn warnings --- #
 warnings.filterwarnings("ignore", category=ConvergenceWarning)
 
 #  --- Parameters --- #

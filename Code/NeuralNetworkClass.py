@@ -2,9 +2,11 @@
 It also contains two examples, one where its used to solve a regression problem and one where its used to
 to solve a classification problem"""
 
-
+import jax
 import numpy as np 
+import jax.numpy as jnp
 import matplotlib.pyplot as plt
+jax.config.update("jax_enable_x64", True)
 
 
 class NeuralNetwork:
@@ -253,6 +255,37 @@ class NeuralNetwork:
                 break
 
         return epoch, costs, unpenalized_costs
+
+    def cost_JAX(self, layers, inputs, targets, activation_funcs, cost_fun):
+        """Full cost (cost function plus penalty) written with jax.numpy so JAX can differentiate it with respect to layers.
+        The activation functions and the cost function are passed in so they can be the JAX versions"""
+
+        a = inputs # a is input to current layer
+
+        for (W, b), activation_func in zip(layers, activation_funcs): # Iterate over layers and activation functions
+            a = activation_func(a @ W + b) # Output of current layer is input to the next
+
+        pen = 0.0 # Penalty term, stays zero if no penalty is chosen
+        if self.penalty == "L1":
+            pen = self.lam*sum(jnp.sum(jnp.abs(W)) for W, _ in layers) # L1 penalty on the weights only
+        elif self.penalty == "L2":
+            pen = self.lam*sum(jnp.sum(W**2) for W, _ in layers) # L2 penalty on the weights only
+        elif self.penalty is not None:
+            raise ValueError(f"Unknown penalty: {self.penalty!r}") # Only L1, L2 or None are valid penalties
+
+        return cost_fun(a, targets) + pen # Same full cost as in the cost method
+
+    def compute_gradient_JAX(self, inputs, targets, activation_funcs=None, cost_fun=None):
+        """Method for computing the same gradients as compute_gradient, but using JAX automatic differentiation instead of manual
+        backpropagation. Returns a list with a tuple (dC_dW, dC_db) for each layer. The activation functions and the cost function must be 
+        written with jax.numpy, so JAX versions can be passed in through activation_funcs and cost_fun. If left as None, the ones stored in the class are used"""
+
+        activation_funcs = self.activation_funcs if activation_funcs is None else activation_funcs # Activation functions used in the forward pass
+        cost_fun = self.cost_fun if cost_fun is None else cost_fun # Cost function used on the output of the network
+
+        grads = jax.grad(self.cost_JAX)(self.layers, jnp.asarray(inputs), jnp.asarray(targets), activation_funcs, cost_fun) # Gradient with respect to the first argument (layers)
+
+        return [(np.asarray(dC_dW), np.asarray(dC_db)) for dC_dW, dC_db in grads] # Convert back to NumPy so update_weights works unchanged
     
 
 if __name__ == "__main__":

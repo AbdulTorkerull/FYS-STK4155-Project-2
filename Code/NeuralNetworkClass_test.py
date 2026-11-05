@@ -2,7 +2,7 @@
 trusted packages like Scikit-Learn, TensorFlow/Keras, PyTorch, and seing if they produce similiar enough results"""
 
 
-from Functions import identity, identity_der, ReLU, ReLU_der, sigmoid, sigmoid_der, mse, mse_der, softmax, cross_entropy, runge
+from Functions import identity, identity_der, sigmoid, sigmoid_der, mse, mse_der, runge
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.neural_network import MLPRegressor
 from NeuralNetworkClass import NeuralNetwork

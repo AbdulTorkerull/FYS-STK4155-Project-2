@@ -228,6 +228,13 @@ class NeuralNetwork:
 
         return self.layers
 
+    def parameter_count(self):
+        """Method for checking how many parameters in total the NeuralNetwork has to train"""
+
+        total_params = sum(W.size + b.size for W, b in self.layers)
+
+        return total_params
+
     def train(self, inputs, targets, epochs=100, M=None, epsilon=1e-6):
         """Method for training the FFNN with minibatch gradient descent. M is the minibatch size, where M=None gives full batch gradient descent.
         Training stops early if the cost changes less than epsilon between two epochs. Returns the number of epochs run, the cost per epoch 

@@ -20,6 +20,7 @@ The project is divided into four folders:
 
 ## Code overview
 
+- `requirment.txt`: Contains information on what packages are required to run the Python/Jypyter files and how to install them.
 - `Functions.py, Functions_JAX.py, Utils.py`: Contains important functions that were reused often throughout many files, such as activaton functions and their derivatives.
 - `NeuralNetworkClass.py, NeuralNetworkWrapper.py`: Contains the Neural Network itself and the Neural Network regressor class that can be used alongside SK-learn cross validation and grid search.
 - `compute_gradient_test, NeuralNetwork_test.py, NeuralNetworkWrapper_test.py`: Test functions for testing the compute_gradient method, the NeuralNetwork class and the NeuralNetworkWrapper class.

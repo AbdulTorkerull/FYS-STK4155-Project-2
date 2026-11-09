@@ -2,6 +2,13 @@
 
 Project 2 in FYS-STK4155: Solving classification and regression problems using neural networks.
 
+## Project Group
+
+- Abdullah Ali Ahmed
+- Heidi Louise Xia Abrahamsen
+- Ander Mathias Rønneberg
+- Sindre Andre Øhman
+
 ## Repository structure
 
 The project is divided into four folders:

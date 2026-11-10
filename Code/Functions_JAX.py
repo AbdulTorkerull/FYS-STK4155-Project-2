@@ -1,8 +1,6 @@
 """File similiar to Functions.py but numpy being replaced by JAX numpy"""
 
-
 import jax.numpy as jnp
-
 
 def identity_JAX(z):
     return z

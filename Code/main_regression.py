@@ -8,7 +8,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.model_selection import KFold, cross_validate, GridSearchCV
 
-from NeuralNetwork import NeuralNetwork
+from NeuralNetworkClass import NeuralNetwork
 from NeuralNetworkWrapper import NeuralNetRegressor
 from Functions import ReLU, ReLU_der, sigmoid, sigmoid_der, mse, mse_der, identity, identity_der, leaky_ReLU, leaky_ReLU_der
 
@@ -410,7 +410,7 @@ def number_of_hidden_layers_and_nodes_plot():
         for n in n_layers:
             # generate n number of hidden layers with corresponding activation function and derivative of activation functions
             layer_output_size = [100] * n + [1]
-            activation_func_ = [activation] * n + [identity]
+            activation_func_ = [activation] * n + [identity] # identity as the last activation function
             activation_ders_ = [activation_der] * n + [identity_der]
 
             """Check if implementation of loop output have correct values""" 

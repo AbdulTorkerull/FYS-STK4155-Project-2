@@ -1,4 +1,6 @@
-# Required packages to run all files
+## Required packages to run all files
+##-------------------------------------
+
 # Install with: pip install -r requirements.txt
 # Or manually: pip install numpy matplotlib seaborn scikit-learn jax jaxlib jupyter
 

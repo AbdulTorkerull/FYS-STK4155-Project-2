@@ -35,11 +35,11 @@ def mse(predict, target):
 def mse_der(predict, target):
     return (2/predict.size)*(predict - target)
 
-def softmax(z):
+def softmax(z): # softmax function (activation)
     e_z = np.exp(z - np.max(z, axis=1, keepdims=True))
     return e_z/np.sum(e_z, axis=1, keepdims=True)
 
-def cross_entropy(predict, target):
+def cross_entropy(predict, target): #multiclass cross entropy
     return np.mean(np.sum(-target*np.log(predict), axis=1))
 
 def runge(x):
